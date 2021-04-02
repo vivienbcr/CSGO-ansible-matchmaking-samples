@@ -1,0 +1,94 @@
+---
+- name: "LGSM and CSGO installation"
+  hosts: all
+  tasks:
+    - name: "OS - Update dependances"
+      apt:
+        update_cache: yes
+      become: yes
+
+    - name : "OS - Setup dependances"
+      block :
+      - name : " APT - Pip3"
+        apt:
+          name: python3-pip
+          update_cache: yes
+        become: yes
+      - name : " PIP3 - pexpect"
+        pip:
+          name: pexpect
+  
+    - name: "LGSM - Check LGSM Exist"
+      stat:
+        path: $HOME/linuxgsm.sh
+      register: lgsmStatus
+
+    # - name: debug
+    #   debug: var=lgsmStatus
+
+    - name : "LGSM - Setup LGSM"
+      block :
+      - name : "LGSM - Download sources"
+        get_url:
+          url: https://linuxgsm.sh
+          dest: $HOME
+          mode: '0440'
+      - name: "LGSM - Set executable script"
+        file: dest=$HOME/linuxgsm.sh mode=+x
+      when: lgsmStatus.stat.exists == false
+    
+    - name: "CSGOD - check if csgo already init"
+      stat:
+        path: $HOME/csgoserver
+      register: csgodstatus
+
+    - name : CSGO - install
+      block :
+      - name: "LGSM - Init CSGO folder"
+        command: "./linuxgsm.sh csgoserver"
+      - name: "CSGOD - Checking Dependencies as root"
+        command: "./csgoserver auto-install"
+        become : yes
+      - name: "CSGOD - Install CSGOD"
+        command: "./csgoserver auto-install"
+      - name: "LGSM - Init CSGO-SERVER2 folder"
+        command: "./linuxgsm.sh csgoserver"
+      - name: "LGSM - Init CSGO-SERVER3 folder"
+        command: "./linuxgsm.sh csgoserver"
+      - name: "LGSM - Init CSGO-SERVER4 folder"
+        command: "./linuxgsm.sh csgoserver"
+      when: csgodstatus.stat.exists == false
+
+    - name: LGSM - Checkmod installed
+      command: grep -e metamod -e sourcemod -e get5 lgsm/mods/installed-mods.txt
+      register: checkmods
+      check_mode: no
+      ignore_errors: yes
+      changed_when: no
+
+    # - name: DEBUG - check mod
+    #   debug: var=checkmods
+    #   when: "'get5' in checkmods.stdout_lines"
+    
+    - name : GSGOD - Install mods
+      block : 
+        - name : "CSGO - Mod install sourcemod"
+          expect: 
+            command: "./csgoserver mods-install"
+            responses: 
+              "Enter an" : "sourcemod"
+          when: "'sourcemod' not in checkmods.stdout_lines"
+
+        - name : "CSGO - Mod install metamod"
+          expect: 
+            command: "./csgoserver mods-install"
+            responses: 
+              "Enter an" : "metamod"
+          when: "'metamod' not in checkmods.stdout_lines"
+
+        - name : "CSGO - Mod install get5"
+          expect: 
+            command: "./csgoserver mods-install"
+            responses: 
+              "Enter an" : "get5"
+          when: "'get5' not in checkmods.stdout_lines"

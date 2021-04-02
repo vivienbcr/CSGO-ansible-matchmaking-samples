@@ -1,0 +1,17 @@
+---
+- name : "GET5 - Setup new match"
+  hosts: all
+  vars:
+    - matchid: "azertyqsd"
+    - map: "de_dust2"
+    - teamOne: ["76561198053172489"]
+    - teamTwo: ["76561198154270169"]
+    - matchhostname: "hostname"
+  tasks:
+  - name : Push GET5 file
+    template:
+      src: get5-valve.j2
+      dest: "/home/ubuntu/serverfiles/csgo/{{matchid}}.cfg"
+      owner: ubuntu
+      group: ubuntu
+      force: yes

@@ -1,0 +1,67 @@
+"Match"
+{
+	"matchid"		"{{ matchid }}"
+	"num_maps"		"1"
+
+	"spectators"
+	{
+		"players"
+		{
+			"STEAM_1:1:....."		""
+			"STEAM_1:1:....."		""
+			"STEAM_1:1:....."		""
+		}
+	}
+
+	"skip_veto"		"1"
+
+	"veto_first"	"team1"
+	"side_type"		"never_knife"
+
+	"maplist"
+	{
+        "{{ map }}"
+	}
+
+	"players_per_team"		"1"
+	"min_players_to_ready"		"1"
+	"min_spectators_to_ready"		"0"
+
+	"favored_percentage_team1"		"65"
+	"favored_percentage_text"		"HLTV Bets"
+
+	"team1"
+	{
+		"name"		"Team1"
+		"tag"		"Team1"
+		"flag"		"FR"
+		"logo"		"nv"
+		"players"
+		{	
+			{% for player in teamOne %}
+				"{{ player }}"		""
+			{% endfor %}
+		}
+	}
+
+	"team2"
+	{
+		"name"		"Team2"
+		"tag"		"Team2"
+		"flag"		"SE"
+		"logo"		"fntc"
+		"players"
+		{
+			{% for player in teamTwo %}
+				"{{ player }}"		""
+			{% endfor %}
+		}
+	}
+
+	"cvars"
+	{
+		"hostname"		"{{ matchhostname }}"
+		"mp_maxrounds"		"1"
+		"mp_competitive_endofmatch_extra_time"		"600"
+	}
+}

@@ -1,0 +1,37 @@
+---
+# https://docs.ansible.com/ansible/latest/modules/ec2_module.html#synopsis
+- name: "AWS new EC2"
+  hosts: all
+  tasks:
+    - name: "Create instance"
+      ec2:
+          key_name: CLE-ANSIBLE-CSGO
+          group: csgo-servers
+          instance_type: t2.small
+          region: eu-west-1
+          image: ami-0701e7be9b2a77600
+          wait: True
+          wait_timeout: 500
+          volumes:
+            - device_name: /dev/sda1
+              volume_type: standard
+              volume_size: 45
+              delete_on_termination: True
+          vpc_subnet_id: subnet-5aad9e12
+          assign_public_ip: True
+          instance_tags:
+            state: empty
+      register: ec2
+
+    - name: Add new instance to host group
+      add_host:
+        hostname: "{{ item.public_ip }}"
+        groupname: launched
+      loop: "{{ ec2.instances }}"
+    
+    - name: Wait for SSH to come up
+      delegate_to: "{{ item.public_dns_name }}"
+      wait_for_connection:
+        delay: 30
+        timeout: 320
+      loop: "{{ ec2.instances }}"

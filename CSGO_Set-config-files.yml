@@ -1,0 +1,127 @@
+---
+- name : "LGSM - CSGO Setup server configuration files"
+  hosts: all
+  vars:
+    - port_list: ["27015","27016","27017","27018"]
+    - clientport_list: ["27005","27006","27007","27008"]
+    - servername_list: ["greed.guru-1","greed.guru-2","greed.guru-3","greed.guru-4"]
+    - sourcetvport_list: ["27020","27021","27022","27023"]
+    - rcon_password: "clmdp2gdotg"
+    - gslt_list: ["4231BD8BB2BBD13644376A617D7283FD","2265D6B1DCE28E82C575E4C0F693A47D","43DD0C89463CEDD1D6264962A1E19B62","A097DF03EBA2E59DD6F3DA031D84157C"]
+    - region: "1"
+  tasks:
+  - name : LGSM Setup srv1
+    template:
+      src: lgsm-server.j2
+      dest: /home/ubuntu/lgsm/config-lgsm/csgoserver/csgoserver.cfg
+      owner: ubuntu
+      group: ubuntu
+      force: yes
+    vars:
+      - port: "{{ port_list[0] }}"
+      - clientport: "{{ clientport_list[0] }}"
+      - sourcetvport: "{{ sourcetvport_list[0] }}"
+      - gslt: "{{ gslt_list[0] }}"
+      - servername: "geedguru-1"
+
+  - name : LGSM Setup srv2
+    template:
+      src: lgsm-server.j2
+      dest: /home/ubuntu/lgsm/config-lgsm/csgoserver/csgoserver-2.cfg
+      owner: ubuntu
+      group: ubuntu
+      force: yes
+    vars:
+      - port: "{{ port_list[1] }}"
+      - clientport: "{{ clientport_list[1] }}"
+      - sourcetvport: "{{ sourcetvport_list[1] }}"
+      - gslt: "{{ gslt_list[1] }}"
+      - servername: "geedguru-2"
+
+  - name : LGSM Setup srv3
+    template:
+      src: lgsm-server.j2
+      dest: /home/ubuntu/lgsm/config-lgsm/csgoserver/csgoserver-3.cfg
+      owner: ubuntu
+      group: ubuntu
+      force: yes
+    vars:
+      - port: "{{ port_list[2] }}"
+      - clientport: "{{ clientport_list[2] }}"
+      - sourcetvport: "{{ sourcetvport_list[2] }}"
+      - gslt: "{{ gslt_list[2] }}"
+
+  - name : LGSM Setup srv4
+    template:
+      src: lgsm-server.j2
+      dest: /home/ubuntu/lgsm/config-lgsm/csgoserver/csgoserver-4.cfg
+      owner: ubuntu
+      group: ubuntu
+      force: yes
+    vars:
+      - port: "{{ port_list[3] }}"
+      - clientport: "{{ clientport_list[3] }}"
+      - sourcetvport: "{{ sourcetvport_list[3] }}"
+      - gslt: "{{ gslt_list[3] }}"
+
+  - name : CSGO setup srv1
+    template:
+      src: csgo-server.j2
+      dest: /home/ubuntu/serverfiles/csgo/cfg/csgoserver.cfg
+      owner: ubuntu
+      group: ubuntu
+      force: yes
+    vars:
+      - servername: "{{ servername_list[0] }}"
+
+  - name : CSGO setup srv2
+    template:
+      src: csgo-server.j2
+      dest: /home/ubuntu/serverfiles/csgo/cfg/csgoserver-2.cfg
+      owner: ubuntu
+      group: ubuntu
+      force: yes
+    vars:
+      - servername: "{{ servername_list[1] }}"
+
+  - name : CSGO setup srv3
+    template:
+      src: csgo-server.j2
+      dest: /home/ubuntu/serverfiles/csgo/cfg/csgoserver-3.cfg
+      owner: ubuntu
+      group: ubuntu
+      force: yes
+    vars:
+      - servername: "{{ servername_list[2] }}"
+
+  - name : CSGO setup srv4
+    template:
+      src: csgo-server.j2
+      dest: /home/ubuntu/serverfiles/csgo/cfg/csgoserver-4.cfg
+      owner: ubuntu
+      group: ubuntu
+      force: yes
+    vars:
+      - servername: "{{ servername_list[3] }}"
+
+  - name: "CSGO Stop srv1"
+    command: "./csgoserver stop"
+    ignore_errors: True 
+  - name: "CSGO Stop srv2"
+    command: "./csgoserver-2 stop"  
+    ignore_errors: True
+  - name: "CSGO Stop srv3"
+    command: "./csgoserver-3 stop"
+    ignore_errors: True
+  - name: "CSGO Stop srv4"
+    command: "./csgoserver-4 stop"
+    ignore_errors: True 
+
+  - name: "CSGO Start srv1"
+    command: "./csgoserver start"  
+  - name: "CSGO Start srv2"
+    command: "./csgoserver-2 start"  
+  - name: "CSGO Start srv3"
+    command: "./csgoserver-3 start"  
+  - name: "CSGO Start srv4"
+    command: "./csgoserver-4 start"  

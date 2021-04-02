@@ -1,0 +1,44 @@
+---
+- name : "AWS - Switch group to ready"
+  hosts: all
+  tasks:
+    - name : "HOST - Get current EC2 instance ip"
+      set_fact: 
+        hostip : "{{ansible_default_ipv4.address}}"
+        cacheable: yes
+
+    - name : "AWS - debug instance informations"
+      debug: var=hostip
+
+- name : AWS - Find instance
+  hosts : localhost
+  connection: local
+  tasks:
+    - name : "VAR tour de passe passe"
+      set_fact: 
+        hostipm : "{{ hostvars.values() | map(attribute='hostip') | list}}"
+        cacheable: yes
+    - name : AWS - get tag
+      ec2_instance_info:
+        region: eu-west-1
+        filters:
+          private-ip-address: "{{hostipm[0]}}"
+          "tag:state": empty
+      register: instances
+    # - name : "AWS - debug instance"
+    #   debug: var=instances   
+    - name : "AWS - get instance id"
+      set_fact: 
+        instanceId : "{{ instances.instances.0.instance_id }}"
+        cacheable: yes
+
+    - name : "AWS - debug instance ID"
+      debug: 
+        msg: "{{instanceId}}"
+        
+    - name : "AWS - set tag"
+      ec2_tag:
+        region: eu-west-1
+        resource: "{{instanceId}}"
+        tags:
+          state: ready
